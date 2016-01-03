@@ -20,12 +20,14 @@ export function destination(url, options){
   return (dispatch, getState) => {return dispatch(timeTravel(url,options))}
 }
 
-export function timeParadox(url, json) {
+export function timeParadox(url, method, json) {
+  //json = _.isObject(json) && _.isArray(json)?json:[json]
+  json = _.isArray(json)?json:[json];
   return {
     type: ACTION_SUCCESS,
     url: url,
     data: json,
-    receivedAt: Date.now()
+    //receivedAt: Date.now()
   }
 }
 
@@ -33,6 +35,6 @@ function timeTravel(url, options) {
   return dispatch => {
     return fetch(url, options)
       .then(response => response.json())
-      .then(json => dispatch(timeParadox(url, json)))
+      .then(json => dispatch(timeParadox(url, options.method, json)))
   }
 }

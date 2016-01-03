@@ -1,11 +1,12 @@
 import * as FluxActions from './actions'
+import _ from 'lodash'
 //import {ACTION_FETCH, ACTION_SUCCESS, ACTION_FAIL, ACTION_RESET} from './constants'
 export default class FluxReducitor{
   constructor(url){
     this.url = url
     this.actions = FluxActions
     this.reducers = function(state = [], action) {
-      console.log( url, 'was called with state', state, 'and action', action)
+      console.log( url, 'was called with state', state, 'and action', action.type, 'and data', _.countBy(action.data) )
       if(url == action.url){
         switch (action.type) {
           case 'ACTION_SUCCESS':
