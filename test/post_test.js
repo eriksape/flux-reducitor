@@ -1,13 +1,13 @@
 import nock from 'nock'
+import expect from 'expect'
 import {ACTION_FETCH, ACTION_SUCCESS, ACTION_FAIL, ACTION_RESET} from '../src/constants'
 import { combineReducers, bindActionCreators, createStore, applyMiddleware } from 'redux'
 import thunk from 'redux-thunk'
 import FluxReducitor from './../src/index'
-import expect from 'expect'
 
 const uri = '/api/users'
-const server = 'http://laravel.com.mx'
-const users = new FluxReducitor(server+uri)
+const server = 'http://example.com'
+const users = new FluxReducitor()
 
 const dataRequest= {"name":"er","email":"er.com"}
 const dataResponse = {"id":100,"name":"er","email":"er.com","created_at":"2016-01-02 15:35:58","updated_at":"2016-01-02 21:35:58"}
@@ -42,13 +42,13 @@ describe('Async Post', () => {
     }
 
     const store = configureStore();
-    store.dispatch(users.actions.destination(server+uri, {
-      method:'post',
-      body: JSON.stringify({
+
+    store.dispatch(users.actions.store.run(
+      JSON.stringify({
         name: 'er',
-        email: 'er.com',
+        email: 'er.com'
       })
-    }));
+    ))
 
     store.subscribe(function(){
       try {

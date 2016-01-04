@@ -28,6 +28,10 @@ function configureStore(initialState) {
   return store
 }
 
+
+const store = configureStore();
+let unsubscribe = ()=>{}
+
 describe('actions with class', () => {
   afterEach(() => { nock.cleanAll() })
   it('should get users list', (done) =>{
@@ -43,10 +47,9 @@ describe('actions with class', () => {
       //receivedAt: Date.now()
     }
 
-    const store = configureStore();
     store.dispatch(users.actions.all.run())
 
-    store.subscribe(() =>{
+    unsubscribe =  store.subscribe(() =>{
       try {
         expect(store.getState()).toEqual(expectedActions)
         done()
@@ -56,4 +59,53 @@ describe('actions with class', () => {
     })
 
   })
+
+  it('store need unsubscribe', (done) => {
+    try {
+      unsubscribe();
+      done()
+    } catch (e) {
+      done(e)
+    } finally {
+
+    }
+  })
+
+  it('should update a user name', (done) => {
+
+    usersResponse[1].name='erik';
+    usersResponse[1].email='erik.erik@erik.com';
+
+    let api = nock(server)
+    .put(uri+'/2')
+    .reply(200, [usersResponse[1]])
+
+
+    const expectedActions = {
+      //type: ACTION_SUCCESS,
+      //url: uri,
+      users: usersResponse,
+      //receivedAt: Date.now()
+    }
+
+    store.dispatch(users.actions.update.run(
+      JSON.stringify({
+        name: 'erik',
+        email: 'erik.erik@erik.com',
+      }),{id:2}
+    ))
+
+    store.subscribe(() =>{
+      try {
+        //console.log(store.getState());
+        expect(store.getState()).toEqual(expectedActions)
+        done()
+      } catch (e) {
+        done(e)
+      }
+    })
+
+
+  })
+
 })

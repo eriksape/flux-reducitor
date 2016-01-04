@@ -1,40 +1,55 @@
 import {ACTION_FETCH, ACTION_SUCCESS, ACTION_FAIL, ACTION_RESET} from './constants'
 import 'isomorphic-fetch'
 import _ from 'lodash'
-//export function getInd function()
+import pathToRegexp from 'path-to-regexp'
 
-let initOptions = {
-  mode :'same-origin',
-  credentials : 'include',
-  headers: {
-    'X-Requested-With': 'XMLHttpRequest'
-  }
-}
+export default class FluxActions{
+  constructor(travel={}, options = {}){
 
-export function fetchOptions(options = {method:'get'} ){
-  return _.assign( initOptions, options )
-}
+    const initOptions = {
+      mode :'same-origin',
+      credentials : 'include',
+      method: 'get',
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      body : ''
+    }
 
-export function destination(url, options){
-  let opts = fetchOptions(options)
-  return (dispatch, getState) => {return dispatch(timeTravel(url,options))}
-}
+    const Options = this.options = _.assign( initOptions, options )
 
-export function timeParadox(url, method, json) {
-  //json = _.isObject(json) && _.isArray(json)?json:[json]
-  json = _.isArray(json)?json:[json];
-  return {
-    type: ACTION_SUCCESS,
-    url: url,
-    data: json,
-    //receivedAt: Date.now()
-  }
-}
+    const timeParadox = this.timeParadox = (url, name, method, json) => {
+      //console.log('time paradox')
+      //json = _.isObject(json) && _.isArray(json)?json:[json]
+      json = _.isArray(json)?json:[json];
+      return {
+        type: ACTION_SUCCESS,
+        url: url,
+        name:name,
+        method: method,
+        data: json,
+        //receivedAt: Date.now()
+      }
+    }
 
-function timeTravel(url, options) {
-  return dispatch => {
-    return fetch(url, options)
-      .then(response => response.json())
-      .then(json => dispatch(timeParadox(url, options.method, json)))
+    const timeTravel = (url, name, method) => {
+      Options.method = method;
+      return dispatch => {
+        //console.log('time travel', url)
+        return fetch(url, Options)
+        .then(response => response.json())
+        .then(json => dispatch(timeParadox(url, name, method, json)))
+        .catch(err => { console.log(err) })
+      }
+    }
+
+    this.run = (body='', urlParms={}) => {
+      let toPath = pathToRegexp.compile(travel.url)
+      console.log('run to destination', travel.method);
+      Options.body = body
+      return (dispatch, getState) => {return dispatch(timeTravel(toPath(urlParms), travel.name, travel.method))}
+    }
+
+
   }
 }
