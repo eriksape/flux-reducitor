@@ -1,6 +1,6 @@
 {
   "name": "flux-reducitor",
-  "version": "0.0.2",
+  "version": "0.0.6",
   "description": "Manage Async/RestAPI acctions in redux infrastructure",
   "main": "index.js",
   "scripts": {
